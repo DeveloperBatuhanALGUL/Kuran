@@ -1,29 +1,24 @@
-# ---- Base Node image ----
 FROM node:20-alpine AS base
 WORKDIR /app
+ENV NEXT_TELEMETRY_DISABLED=1
 
-# ---- Dependencies ----
 FROM base AS deps
-COPY package.json pnpm-lock.yaml ./
-RUN npm install -g pnpm && pnpm install --frozen-lockfile
+COPY package.json package-lock.json ./
+RUN npm ci --no-audit --no-fund
 
-# ---- Build ----
-FROM deps AS build
+FROM base AS build
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN --mount=type=cache,target=/app/.next/cache pnpm build
+RUN npm run build
 
-# ---- Production Image ----
 FROM base AS runner
 ENV NODE_ENV=production
-WORKDIR /app
-
-# Copy only necessary files
+RUN addgroup -S nodejs && adduser -S nextjs -G nodejs
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=build /app/.next ./.next
+COPY --from=build --chown=nextjs:nodejs /app/.next ./.next
 COPY --from=build /app/public ./public
 COPY --from=build /app/package.json ./package.json
 COPY --from=build /app/next.config.mjs ./next.config.mjs
-
+USER nextjs
 EXPOSE 3000
-
 CMD ["npm", "start"]
