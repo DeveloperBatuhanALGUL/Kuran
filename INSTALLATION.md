@@ -53,9 +53,9 @@ cp .env.example .env.local
 `.env.local` dosyasını düzenleyerek gerekli API bilgilerini girin:
 
 ```env
-# Diyanet API ayarları - Diyanet İşleri Başkanlığı'ndan alınacak
-DIB_KURAN_API_BASE_URL=https://api.diyanet.gov.tr
-DIB_KURAN_API_TOKEN=your_actual_api_token_here
+# API adresi ve token için: https://acikkaynakkuran-dev.diyanet.gov.tr
+DIB_KURAN_API_BASE_URL=
+DIB_KURAN_API_TOKEN=
 
 # Temel uygulama ayarları (henüz altyapı hazır değil)
 # FRONTEND_APP_PORT=3000
